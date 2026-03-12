@@ -6,10 +6,8 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   Globe,
-  Link2,
   Users,
   Database,
-  Bell,
   Settings,
   Shield,
   LogOut,
@@ -18,10 +16,8 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Dominios', href: '/dashboard/domains', icon: Globe },
-  { name: 'URLs Phishing', href: '/dashboard/phishing', icon: Link2 },
   { name: 'Redes Sociales', href: '/dashboard/social', icon: Users },
   { name: 'Dark Web', href: '/dashboard/darkweb', icon: Database },
-  { name: 'Alertas', href: '/dashboard/alerts', icon: Bell },
   { name: 'Configuración', href: '/dashboard/settings', icon: Settings },
 ];
 
@@ -47,7 +43,7 @@ export function Sidebar() {
           Módulos
         </p>
         {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
@@ -61,11 +57,6 @@ export function Sidebar() {
             >
               <item.icon className="h-4 w-4 shrink-0" />
               {item.name}
-              {item.name === 'Alertas' && (
-                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                  3
-                </span>
-              )}
             </Link>
           );
         })}

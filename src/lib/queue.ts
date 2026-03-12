@@ -10,6 +10,7 @@ export const QUEUE_NAMES = {
   PHISHING_ANALYZER: 'phishing-analyzer',
   HIBP_CHECKER: 'hibp-checker',
   SLACK_NOTIFIER: 'slack-notifier',
+  SOCIAL_SCANNER: 'social-scanner',
 } as const;
 
 // Queue instances (created lazily to avoid import-time connection)
@@ -17,6 +18,7 @@ let _domainQueue: Queue | null = null;
 let _phishingQueue: Queue | null = null;
 let _hibpQueue: Queue | null = null;
 let _slackQueue: Queue | null = null;
+let _socialQueue: Queue | null = null;
 
 export function getDomainQueue(): Queue {
   if (!_domainQueue) {
@@ -44,6 +46,13 @@ export function getSlackQueue(): Queue {
     _slackQueue = new Queue(QUEUE_NAMES.SLACK_NOTIFIER, { connection });
   }
   return _slackQueue;
+}
+
+export function getSocialQueue(): Queue {
+  if (!_socialQueue) {
+    _socialQueue = new Queue(QUEUE_NAMES.SOCIAL_SCANNER, { connection });
+  }
+  return _socialQueue;
 }
 
 export { connection as redisConnection };
