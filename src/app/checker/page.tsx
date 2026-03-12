@@ -256,23 +256,12 @@ export default function CheckerPage() {
                 <MailCheck className="h-8 w-8 text-white" />
               </div>
               <h2 className="mb-3 text-2xl font-bold text-white">
-                Leé lo que viene<br />
-                <span className="text-blue-400">después del @</span>
+                ¿Recibiste un mail<br />
+                <span className="text-blue-400">sospechoso?</span>
               </h2>
-              <p className="max-w-sm text-sm text-slate-400 leading-relaxed">
-                Pegá el remitente, el asunto o el cuerpo del mail, o adjuntá una captura. Si genera dudas, no hagas clic.
+              <p className="max-w-xs text-sm text-slate-400 leading-relaxed">
+                Subí o pegá el mail y te decimos si es real o phishing.
               </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-2">
-                {['@cocos.capital', '@cocoscrypto.com', '@mailing.cocos.capital'].map((d) => (
-                  <span
-                    key={d}
-                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300"
-                  >
-                    {d}
-                  </span>
-                ))}
-              </div>
-              <p className="mt-2 text-xs text-slate-600">dominios oficiales de Cocos</p>
             </div>
           )}
 
@@ -351,11 +340,11 @@ export default function CheckerPage() {
             </div>
           )}
 
-          <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
+          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex-shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-white/10 hover:text-slate-300 transition-colors"
+              className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-slate-200 transition-colors"
               title="Adjuntar captura"
             >
               <ImagePlus className="h-5 w-5" />
@@ -365,22 +354,22 @@ export default function CheckerPage() {
 
             <textarea
               ref={textareaRef}
-              rows={1}
+              rows={2}
               value={input}
               onChange={handleInput}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
               placeholder="Pegá el mail, el remitente, el asunto… lo que tengas"
-              className="flex-1 resize-none bg-transparent text-sm text-white placeholder:text-slate-600 focus:outline-none"
-              style={{ maxHeight: '160px' }}
+              className="flex-1 resize-none bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
+              style={{ maxHeight: '200px' }}
             />
 
             <button
               onClick={handleSend}
               disabled={!canSend}
-              className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-500 disabled:bg-white/10 disabled:text-slate-600 shadow-lg shadow-blue-600/20 disabled:shadow-none"
+              className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-500 disabled:bg-white/10 disabled:text-slate-600 shadow-lg shadow-blue-600/20 disabled:shadow-none"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             </button>
           </div>
           <p className="mt-1.5 text-center text-xs text-slate-700">Enter para enviar · Shift+Enter para nueva línea</p>

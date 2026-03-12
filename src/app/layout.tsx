@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Cocos Security Portal',
   description: 'Anti-phishing and brand protection platform for Cocos Capital',
+  other: {
+    'format-detection': 'telephone=no,date=no,address=no,email=no,url=no',
+  },
 };
 
 export const viewport: Viewport = {
