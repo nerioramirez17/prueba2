@@ -60,6 +60,27 @@ export const USERNAME_VARIATIONS: string[] = [
   'cocosinversiones',
   'cocos_inversiones',
   'cocoscap_ar',
+  'cocoscapitalar',
+  'cocoscap_oficial',
+  'cocoscap_arg',
+  'cocoscapoficial',
+  'cocos_cap_ar',
+  'cocoscapitalargen',
+  'cocos_capital_ar',
+  'cocos_capital_arg',
+  'cocos_capital_oficial',
+  'cocos_capital_argentina',
+  'cocoscapitalinversiones',
+  'cocosinversiones_ar',
+  'cocoscap_invest',
+  'cocos_invest',
+];
+
+/** Keywords to search on Instagram (each triggers a full search query) */
+const IG_SEARCH_QUERIES = [
+  'cocoscapital',
+  'cocos capital',
+  'cocos inversiones',
 ];
 
 /** Official accounts to skip */
@@ -268,95 +289,153 @@ function parseInstagramOgTags(html: string): { displayName: string | null; bio: 
   return { displayName, bio };
 }
 
+// ─── Instagram: keyword search ─────────────────────────────────────────────────
+// Uses IG's internal search endpoint to find ALL accounts matching a query,
+// just like the search bar in the app. No auth required (best-effort).
+
+const IG_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept': '*/*',
+  'Accept-Language': 'es-AR,es;q=0.9,en;q=0.8',
+  'x-ig-app-id': '936619743392459',
+  'X-Requested-With': 'XMLHttpRequest',
+  'Referer': 'https://www.instagram.com/',
+  'Origin': 'https://www.instagram.com',
+};
+
+async function searchInstagramByKeyword(query: string): Promise<Array<{ username: string; fullName: string | null; bio: string | null }>> {
+  try {
+    const res = await axios.get('https://www.instagram.com/web/search/topsearch/', {
+      params: { query, count: 50, context: 'blended', rank_token: '' },
+      headers: IG_HEADERS,
+      timeout: 12000,
+      validateStatus: (s) => s < 500,
+    });
+
+    if (res.status !== 200 || !res.data?.users) {
+      console.log(`[social:ig:search] query="${query}" → status=${res.status}, no users field`);
+      return [];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const users = (res.data.users as any[]).map((entry) => ({
+      username: (entry.user?.username ?? '') as string,
+      fullName: (entry.user?.full_name ?? null) as string | null,
+      bio: (entry.user?.biography ?? null) as string | null,
+    })).filter((u) => u.username);
+
+    console.log(`[social:ig:search] query="${query}" → ${users.length} results`);
+    return users;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.log(`[social:ig:search] query="${query}" → error: ${msg.slice(0, 100)}`);
+    return [];
+  }
+}
+
+// ─── Instagram: verify single username via OG tags ─────────────────────────────
+
+async function verifyInstagramUsername(username: string): Promise<{ found: boolean; displayName: string | null; bio: string | null }> {
+  const url = `https://www.instagram.com/${username}/`;
+
+  // Strategy 1: unofficial JSON API
+  try {
+    const res = await axios.get('https://www.instagram.com/api/v1/users/web_profile_info/', {
+      params: { username },
+      headers: IG_HEADERS,
+      timeout: 8000,
+      validateStatus: (s) => s < 500,
+    });
+    if (res.status === 200 && res.data?.data?.user) {
+      const user = res.data.data.user;
+      return { found: true, displayName: user.full_name || null, bio: user.biography || null };
+    }
+  } catch { /* fall through */ }
+
+  // Strategy 2: OG meta tags with Googlebot UA
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'es-AR,es;q=0.9,en;q=0.8',
+      },
+      timeout: 10000,
+      maxRedirects: 3,
+      validateStatus: (s) => s < 500,
+    });
+    if (res.status === 200 && typeof res.data === 'string') {
+      const { displayName, bio } = parseInstagramOgTags(res.data);
+      const isProfilePage = res.data.includes('"ProfilePage"') || res.data.includes(`"${username}"`);
+      if (isProfilePage || displayName) {
+        return { found: true, displayName, bio };
+      }
+    }
+  } catch { /* not found */ }
+
+  return { found: false, displayName: null, bio: null };
+}
+
 // ─── Instagram scanner ─────────────────────────────────────────────────────────
 
 async function scanInstagram(): Promise<PlatformResult> {
-  const toCheck = USERNAME_VARIATIONS.filter(
-    (u) => !OFFICIAL_IG.map((o) => o.toLowerCase()).includes(u.toLowerCase()),
-  );
-
+  const officialLower = OFFICIAL_IG.map((o) => o.toLowerCase());
   const profiles: SocialProfile[] = [];
+  const seenUsernames = new Set<string>();
   const manualCheckUrls: { username: string; url: string }[] = [];
 
-  for (const username of toCheck) {
+  // ── Step 1: keyword search (finds accounts we'd never guess) ──────────────
+  for (const query of IG_SEARCH_QUERIES) {
+    const results = await searchInstagramByKeyword(query);
+    for (const { username, fullName, bio } of results) {
+      const lower = username.toLowerCase();
+      if (officialLower.includes(lower) || seenUsernames.has(lower)) continue;
+
+      // Only include accounts that look related to the brand
+      const normalized = lower.replace(/[._\-]/g, '');
+      const isBrandRelated =
+        normalized.includes('cocos') ||
+        normalized.includes('cocoscap') ||
+        (fullName?.toLowerCase().includes('cocos') ?? false);
+
+      if (!isBrandRelated) continue;
+
+      seenUsernames.add(lower);
+      const url = `https://www.instagram.com/${username}/`;
+      manualCheckUrls.push({ username, url });
+      console.log(`[social:ig:search] ✅ FOUND @${username} (via keyword "${query}")`);
+      profiles.push(makeProfile('instagram', 'Instagram', username, url, fullName, bio));
+    }
+
+    await new Promise((r) => setTimeout(r, 600));
+  }
+
+  // ── Step 2: verify hardcoded variations not already found via search ───────
+  const variationsToCheck = USERNAME_VARIATIONS.filter(
+    (u) => !officialLower.includes(u.toLowerCase()) && !seenUsernames.has(u.toLowerCase()),
+  );
+
+  for (const username of variationsToCheck) {
     const url = `https://www.instagram.com/${username}/`;
     manualCheckUrls.push({ username, url });
 
-    // Strategy 1: unofficial JSON API
-    let found = false;
-    try {
-      const res = await axios.get('https://www.instagram.com/api/v1/users/web_profile_info/', {
-        params: { username },
-        headers: {
-          'x-ig-app-id': '936619743392459',
-          'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          Accept: '*/*',
-          'Accept-Language': 'es-AR,es;q=0.9,en;q=0.8',
-          Referer: 'https://www.instagram.com/',
-        },
-        timeout: 8000,
-        validateStatus: (s) => s < 500,
-      });
-
-      if (res.status === 200 && res.data?.data?.user) {
-        const user = res.data.data.user;
-        console.log(`[social:ig] ✅ JSON FOUND @${username}`);
-        profiles.push(makeProfile('instagram', 'Instagram', username, url, user.full_name || null, user.biography || null));
-        found = true;
-      }
-    } catch {
-      // fall through to strategy 2
+    const { found, displayName, bio } = await verifyInstagramUsername(username);
+    if (found) {
+      seenUsernames.add(username.toLowerCase());
+      console.log(`[social:ig:check] ✅ FOUND @${username}`);
+      profiles.push(makeProfile('instagram', 'Instagram', username, url, displayName, bio));
+    } else {
+      console.log(`[social:ig:check] ✗ @${username} not found`);
     }
 
-    // Strategy 2: public page OG meta tags (free, works even when JSON API is blocked)
-    if (!found) {
-      try {
-        const res = await axios.get(url, {
-          headers: {
-            'User-Agent':
-              'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-            'Accept': 'text/html,application/xhtml+xml',
-            'Accept-Language': 'es-AR,es;q=0.9,en;q=0.8',
-          },
-          timeout: 10000,
-          maxRedirects: 3,
-          validateStatus: (s) => s < 500,
-        });
-
-        if (res.status === 200 && typeof res.data === 'string') {
-          const { displayName, bio } = parseInstagramOgTags(res.data);
-          // Confirm the page is actually a profile (not a login redirect)
-          const isProfilePage = res.data.includes('"ProfilePage"') || res.data.includes(`"${username}"`);
-
-          if (isProfilePage || displayName) {
-            console.log(`[social:ig] ✅ OG FOUND @${username} → name="${displayName}"`);
-            profiles.push(makeProfile('instagram', 'Instagram', username, url, displayName, bio));
-            found = true;
-          } else {
-            console.log(`[social:ig] ✗ @${username} → page loaded but no profile data (likely login wall)`);
-          }
-        } else {
-          console.log(`[social:ig] ✗ @${username} → status=${res.status}`);
-        }
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        console.log(`[social:ig] ✗ @${username} → OG error: ${msg.slice(0, 80)}`);
-      }
-    }
-
-    // Small delay between requests to avoid rate limiting
     await new Promise((r) => setTimeout(r, 400));
   }
 
   profiles.sort((a, b) => b.riskScore - a.riskScore);
   const status: PlatformStatus = profiles.length > 0 ? 'LIMITED' : 'MANUAL';
 
-  return {
-    status,
-    profiles,
-    manualCheckUrls,
-  };
+  return { status, profiles, manualCheckUrls };
 }
 
 // ─── TikTok (manual only) ──────────────────────────────────────────────────────
