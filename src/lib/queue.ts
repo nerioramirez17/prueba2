@@ -8,7 +8,6 @@ const connection: ConnectionOptions = {
 export const QUEUE_NAMES = {
   DOMAIN_SCANNER: 'domain-scanner',
   PHISHING_ANALYZER: 'phishing-analyzer',
-  HIBP_CHECKER: 'hibp-checker',
   SLACK_NOTIFIER: 'slack-notifier',
   SOCIAL_SCANNER: 'social-scanner',
 } as const;
@@ -16,7 +15,6 @@ export const QUEUE_NAMES = {
 // Queue instances (created lazily to avoid import-time connection)
 let _domainQueue: Queue | null = null;
 let _phishingQueue: Queue | null = null;
-let _hibpQueue: Queue | null = null;
 let _slackQueue: Queue | null = null;
 let _socialQueue: Queue | null = null;
 
@@ -32,13 +30,6 @@ export function getPhishingQueue(): Queue {
     _phishingQueue = new Queue(QUEUE_NAMES.PHISHING_ANALYZER, { connection });
   }
   return _phishingQueue;
-}
-
-export function getHibpQueue(): Queue {
-  if (!_hibpQueue) {
-    _hibpQueue = new Queue(QUEUE_NAMES.HIBP_CHECKER, { connection });
-  }
-  return _hibpQueue;
 }
 
 export function getSlackQueue(): Queue {

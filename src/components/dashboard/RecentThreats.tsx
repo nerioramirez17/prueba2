@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Globe, Link2, Users, Database } from 'lucide-react';
+import { Globe, Link2, Users } from 'lucide-react';
 
 const mockThreats = [
   {
@@ -37,14 +37,6 @@ const mockThreats = [
     detectedAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
   },
   {
-    id: '4',
-    type: 'DARK_WEB',
-    title: 'Filtración: 1.200 emails @cocos-capital.com.ar',
-    severity: 'CRITICAL' as const,
-    status: 'DETECTED' as const,
-    detectedAt: new Date(Date.now() - 1000 * 60 * 60 * 8),
-  },
-  {
     id: '5',
     type: 'DOMAIN',
     title: 'cocos-inversiones.com',
@@ -58,14 +50,12 @@ const typeIcon = {
   DOMAIN: <Globe className="h-4 w-4 text-blue-500" />,
   PHISHING_URL: <Link2 className="h-4 w-4 text-red-500" />,
   SOCIAL_MEDIA: <Users className="h-4 w-4 text-purple-500" />,
-  DARK_WEB: <Database className="h-4 w-4 text-gray-500" />,
 };
 
 const typeLabel = {
   DOMAIN: 'Dominio',
   PHISHING_URL: 'URL',
   SOCIAL_MEDIA: 'Redes',
-  DARK_WEB: 'Dark Web',
 };
 
 export function RecentThreats() {

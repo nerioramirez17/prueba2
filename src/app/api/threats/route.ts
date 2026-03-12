@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { z } from 'zod';
 
 const createThreatSchema = z.object({
-  type: z.enum(['DOMAIN', 'PHISHING_URL', 'SOCIAL_MEDIA', 'DARK_WEB', 'APP_STORE']),
+  type: z.enum(['DOMAIN', 'PHISHING_URL', 'SOCIAL_MEDIA', 'APP_STORE']),
   severity: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
   title: z.string().min(1).max(255),
   description: z.string().optional(),

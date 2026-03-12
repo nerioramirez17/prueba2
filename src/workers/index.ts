@@ -6,7 +6,6 @@
 
 import './domain.worker';
 import './phishing.worker';
-import './hibp.worker';
 import './social.worker';
 
 console.log('🔄 All workers started. Waiting for jobs...');

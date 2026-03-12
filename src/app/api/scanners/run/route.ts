@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const runScanSchema = z.object({
-  module: z.enum(['DOMAIN_WATCHDOG', 'PHISHING_ANALYZER', 'SOCIAL_MONITOR', 'DARK_WEB_MONITOR']),
+  module: z.enum(['DOMAIN_WATCHDOG', 'PHISHING_ANALYZER', 'SOCIAL_MONITOR']),
   target: z.string().optional(),
 });
 

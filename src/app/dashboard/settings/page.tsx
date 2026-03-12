@@ -169,7 +169,6 @@ export default function SettingsPage() {
                 { label: 'Dominio principal', value: 'cocos-capital.com.ar' },
                 { label: 'Variaciones a monitorear', value: '156 dominios' },
                 { label: 'Frecuencia de escaneo', value: 'Cada 6 horas' },
-                { label: 'Emails a monitorear (HIBP)', value: '@cocos-capital.com.ar' },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between py-2">
                   <div>

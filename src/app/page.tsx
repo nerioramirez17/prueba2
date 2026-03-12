@@ -42,7 +42,7 @@ export default function SelectorPage() {
                 Portal de Seguridad
               </h2>
               <p className="flex-1 text-sm text-gray-500">
-                Monitoreo de amenazas, análisis de dominios, dark web, redes sociales y gestión de alertas en tiempo real.
+                Monitoreo de amenazas, análisis de dominios, redes sociales y gestión de alertas en tiempo real.
               </p>
               <div className="mt-6 flex items-center text-sm font-semibold text-blue-600">
                 Acceder al portal

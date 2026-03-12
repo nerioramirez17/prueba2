@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Globe,
   Users,
-  Database,
   Settings,
   Shield,
   LogOut,
@@ -17,7 +16,6 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Dominios', href: '/dashboard/domains', icon: Globe },
   { name: 'Redes Sociales', href: '/dashboard/social', icon: Users },
-  { name: 'Dark Web', href: '/dashboard/darkweb', icon: Database },
   { name: 'Configuración', href: '/dashboard/settings', icon: Settings },
 ];
 
