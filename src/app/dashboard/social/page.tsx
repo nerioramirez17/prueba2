@@ -253,77 +253,115 @@ function ProfilesTable({ profiles }: { profiles: SocialProfile[] }) {
   if (profiles.length === 0) return null;
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-gray-50">
-          <TableHead className="text-xs">Plataforma</TableHead>
-          <TableHead className="text-xs">Usuario</TableHead>
-          <TableHead className="text-xs">Bio detectada</TableHead>
-          <TableHead className="text-xs">Risk Score</TableHead>
-          <TableHead className="text-xs">Severidad</TableHead>
-          <TableHead className="text-xs"></TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <>
+      {/* Mobile: card list */}
+      <div className="block md:hidden divide-y divide-gray-100">
         {profiles.map((a) => {
           const meta = PLATFORM_META[a.platform];
           return (
-            <TableRow key={a.id} className="hover:bg-gray-50">
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`flex h-6 w-6 items-center justify-center rounded text-xs font-bold ${meta.color} ${meta.textColor}`}
-                  >
-                    {meta.emoji}
-                  </span>
-                  <span className="text-sm text-gray-700">{meta.label}</span>
-                </div>
-              </TableCell>
-              <TableCell>
+            <div key={a.id} className="flex items-start gap-3 px-4 py-3">
+              <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded text-sm font-bold ${meta.color} ${meta.textColor}`}>
+                {meta.emoji}
+              </span>
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-gray-900">@{a.username}</p>
-                {a.displayName && (
-                  <p className="text-xs text-gray-500">{a.displayName}</p>
-                )}
-              </TableCell>
-              <TableCell>
-                <p className="max-w-xs truncate text-xs text-gray-500">{a.bio ?? '—'}</p>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-gray-100">
-                    <div
-                      className={`h-full rounded-full ${
-                        a.riskScore >= 75
-                          ? 'bg-red-500'
-                          : a.riskScore >= 55
-                            ? 'bg-orange-500'
-                            : a.riskScore >= 35
-                              ? 'bg-yellow-500'
-                              : 'bg-green-500'
-                      }`}
-                      style={{ width: `${a.riskScore}%` }}
-                    />
+                {a.bio && <p className="truncate text-xs text-gray-500">{a.bio}</p>}
+                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                  <SeverityBadge severity={a.severity} />
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-1.5 w-12 overflow-hidden rounded-full bg-gray-100">
+                      <div
+                        className={`h-full rounded-full ${a.riskScore >= 75 ? 'bg-red-500' : a.riskScore >= 55 ? 'bg-orange-500' : a.riskScore >= 35 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                        style={{ width: `${a.riskScore}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-600">{a.riskScore}</span>
                   </div>
-                  <span className="text-xs font-medium tabular-nums text-gray-700">
-                    {a.riskScore}
-                  </span>
                 </div>
-              </TableCell>
-              <TableCell>
-                <SeverityBadge severity={a.severity} />
-              </TableCell>
-              <TableCell>
-                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                  <a href={a.profileUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                </Button>
-              </TableCell>
-            </TableRow>
+              </div>
+              <a href={a.profileUrl} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-gray-400 hover:text-gray-600">
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
           );
         })}
-      </TableBody>
-    </Table>
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50">
+              <TableHead className="text-xs">Plataforma</TableHead>
+              <TableHead className="text-xs">Usuario</TableHead>
+              <TableHead className="text-xs">Bio detectada</TableHead>
+              <TableHead className="text-xs">Risk Score</TableHead>
+              <TableHead className="text-xs">Severidad</TableHead>
+              <TableHead className="text-xs"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {profiles.map((a) => {
+              const meta = PLATFORM_META[a.platform];
+              return (
+                <TableRow key={a.id} className="hover:bg-gray-50">
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`flex h-6 w-6 items-center justify-center rounded text-xs font-bold ${meta.color} ${meta.textColor}`}
+                      >
+                        {meta.emoji}
+                      </span>
+                      <span className="text-sm text-gray-700">{meta.label}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <p className="text-sm font-medium text-gray-900">@{a.username}</p>
+                    {a.displayName && (
+                      <p className="text-xs text-gray-500">{a.displayName}</p>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <p className="max-w-xs truncate text-xs text-gray-500">{a.bio ?? '—'}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-gray-100">
+                        <div
+                          className={`h-full rounded-full ${
+                            a.riskScore >= 75
+                              ? 'bg-red-500'
+                              : a.riskScore >= 55
+                                ? 'bg-orange-500'
+                                : a.riskScore >= 35
+                                  ? 'bg-yellow-500'
+                                  : 'bg-green-500'
+                          }`}
+                          style={{ width: `${a.riskScore}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium tabular-nums text-gray-700">
+                        {a.riskScore}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <SeverityBadge severity={a.severity} />
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <a href={a.profileUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 }
 
@@ -460,7 +498,7 @@ export default function SocialPage() {
         title="Social Media Monitor"
         subtitle="Detección de cuentas fraudulentas en redes sociales"
       />
-      <div className="flex-1 space-y-6 p-6">
+      <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
 
         {/* Per-platform cards */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -475,7 +513,7 @@ export default function SocialPage() {
         </div>
 
         {/* Summary stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-3 md:gap-4">
           {[
             {
               label: 'Cuentas detectadas',

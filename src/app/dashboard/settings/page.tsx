@@ -78,7 +78,7 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-1 flex-col overflow-auto">
       <Header title="Configuración" subtitle="Gestión de usuarios y configuración del sistema" />
-      <div className="flex-1 space-y-6 p-6">
+      <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
         {/* User management */}
         <Card className="border border-gray-200">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -96,63 +96,95 @@ export default function SettingsPage() {
             </Button>
           </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="text-xs">Nombre</TableHead>
-                  <TableHead className="text-xs">Email</TableHead>
-                  <TableHead className="text-xs">Rol</TableHead>
-                  <TableHead className="text-xs">Último acceso</TableHead>
-                  <TableHead className="text-xs">Estado</TableHead>
-                  <TableHead className="text-xs"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockUsers.map((u) => (
-                  <TableRow key={u.id} className="hover:bg-gray-50">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
-                          {u.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                        </div>
-                        <span className="text-sm font-medium text-gray-900">{u.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">{u.email}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${roleConfig[u.role as keyof typeof roleConfig].className}`}
-                      >
+            {/* Mobile: card list */}
+            <div className="block md:hidden divide-y divide-gray-100">
+              {mockUsers.map((u) => (
+                <div key={u.id} className="flex items-center gap-3 px-4 py-3">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                    {u.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-gray-900">{u.name}</p>
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${roleConfig[u.role as keyof typeof roleConfig].className}`}>
                         {roleConfig[u.role as keyof typeof roleConfig].icon}
                         {roleConfig[u.role as keyof typeof roleConfig].label}
                       </span>
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-500">{u.lastLogin}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          u.active
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-500'
-                        }`}
-                      >
-                        {u.active ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    </div>
+                    <p className="truncate text-xs text-gray-500">{u.email}</p>
+                  </div>
+                  <div className="flex flex-shrink-0 items-center gap-1">
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${u.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      {u.active ? 'Activo' : 'Inactivo'}
+                    </span>
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: table */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50">
+                    <TableHead className="text-xs">Nombre</TableHead>
+                    <TableHead className="text-xs">Email</TableHead>
+                    <TableHead className="text-xs">Rol</TableHead>
+                    <TableHead className="text-xs">Último acceso</TableHead>
+                    <TableHead className="text-xs">Estado</TableHead>
+                    <TableHead className="text-xs"></TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {mockUsers.map((u) => (
+                    <TableRow key={u.id} className="hover:bg-gray-50">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                            {u.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                          </div>
+                          <span className="text-sm font-medium text-gray-900">{u.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-600">{u.email}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${roleConfig[u.role as keyof typeof roleConfig].className}`}
+                        >
+                          {roleConfig[u.role as keyof typeof roleConfig].icon}
+                          {roleConfig[u.role as keyof typeof roleConfig].label}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-500">{u.lastLogin}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            u.active
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 text-gray-500'
+                          }`}
+                        >
+                          {u.active ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 

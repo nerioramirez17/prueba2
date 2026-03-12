@@ -67,45 +67,67 @@ export function RecentThreats() {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-gray-100 bg-gray-50">
-              <TableHead className="text-xs font-medium text-gray-500">Tipo</TableHead>
-              <TableHead className="text-xs font-medium text-gray-500">Amenaza</TableHead>
-              <TableHead className="text-xs font-medium text-gray-500">Severidad</TableHead>
-              <TableHead className="text-xs font-medium text-gray-500">Estado</TableHead>
-              <TableHead className="text-xs font-medium text-gray-500">Detectada</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockThreats.map((threat) => (
-              <TableRow key={threat.id} className="cursor-pointer hover:bg-gray-50">
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {typeIcon[threat.type as keyof typeof typeIcon]}
-                    <span className="text-xs text-gray-500">
-                      {typeLabel[threat.type as keyof typeof typeLabel]}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="max-w-xs truncate text-sm font-medium text-gray-900 block">
-                    {threat.title}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <SeverityBadge severity={threat.severity} />
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={threat.status} />
-                </TableCell>
-                <TableCell className="text-xs text-gray-500">
-                  {formatRelativeTime(threat.detectedAt)}
-                </TableCell>
+        {/* Mobile: card list */}
+        <div className="block md:hidden divide-y divide-gray-100">
+          {mockThreats.map((threat) => (
+            <div key={threat.id} className="flex items-start gap-3 px-4 py-3">
+              <div className="mt-0.5 flex-shrink-0">
+                {typeIcon[threat.type as keyof typeof typeIcon]}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-gray-900">{threat.title}</p>
+                <p className="text-xs text-gray-500">{typeLabel[threat.type as keyof typeof typeLabel]}</p>
+              </div>
+              <div className="flex flex-shrink-0 flex-col items-end gap-1">
+                <SeverityBadge severity={threat.severity} />
+                <span className="text-xs text-gray-400">{formatRelativeTime(threat.detectedAt)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-gray-100 bg-gray-50">
+                <TableHead className="text-xs font-medium text-gray-500">Tipo</TableHead>
+                <TableHead className="text-xs font-medium text-gray-500">Amenaza</TableHead>
+                <TableHead className="text-xs font-medium text-gray-500">Severidad</TableHead>
+                <TableHead className="text-xs font-medium text-gray-500">Estado</TableHead>
+                <TableHead className="text-xs font-medium text-gray-500">Detectada</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {mockThreats.map((threat) => (
+                <TableRow key={threat.id} className="cursor-pointer hover:bg-gray-50">
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {typeIcon[threat.type as keyof typeof typeIcon]}
+                      <span className="text-xs text-gray-500">
+                        {typeLabel[threat.type as keyof typeof typeLabel]}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="max-w-xs truncate text-sm font-medium text-gray-900 block">
+                      {threat.title}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <SeverityBadge severity={threat.severity} />
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={threat.status} />
+                  </TableCell>
+                  <TableCell className="text-xs text-gray-500">
+                    {formatRelativeTime(threat.detectedAt)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

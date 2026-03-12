@@ -88,7 +88,7 @@ export default function DomainsPage() {
         title="Domain Watchdog"
         subtitle="Monitoreo de dominios similares a cocos-capital.com.ar"
       />
-      <div className="flex-1 space-y-6 p-6">
+      <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
         {/* Summary cards */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {[
@@ -160,69 +160,95 @@ export default function DomainsPage() {
             )}
 
             {domains.length > 0 && (
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="text-xs">Dominio</TableHead>
-                    <TableHead className="text-xs">Emisor del cert.</TableHead>
-                    <TableHead className="text-xs">Fecha cert.</TableHead>
-                    <TableHead className="text-xs">Risk Score</TableHead>
-                    <TableHead className="text-xs">Severidad</TableHead>
-                    <TableHead className="text-xs">Estado</TableHead>
-                    <TableHead className="text-xs"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Mobile: card list */}
+                <div className="block md:hidden divide-y divide-gray-100">
                   {domains.map((d) => (
-                    <TableRow key={d.id} className="hover:bg-gray-50">
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Globe2 className="h-4 w-4 shrink-0 text-gray-400" />
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{d.domain}</p>
-                            {d.ip && (
-                              <p className="text-xs text-gray-400">{d.ip}</p>
-                            )}
-                          </div>
+                    <div key={d.id} className="flex items-start gap-3 px-4 py-3">
+                      <Globe2 className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-gray-900">{d.domain}</p>
+                        {d.ip && <p className="text-xs text-gray-400">{d.ip}</p>}
+                        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                          <SeverityBadge severity={d.severity} />
+                          <StatusBadge status={d.status} />
+                          <RiskScoreBar score={d.riskScore} />
                         </div>
-                      </TableCell>
-                      <TableCell className="max-w-[180px] truncate text-xs text-gray-500">
-                        {d.issuer
-                          ? d.issuer.match(/O=([^,]+)/)?.[1] ?? d.issuer
-                          : '—'}
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-600">
-                        {formatCertDate(d.certDate)}
-                      </TableCell>
-                      <TableCell>
-                        <RiskScoreBar score={d.riskScore} />
-                      </TableCell>
-                      <TableCell>
-                        <SeverityBadge severity={d.severity} />
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={d.status} />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          asChild
-                        >
-                          <a
-                            href={`https://${d.domain}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      <a href={`https://${d.domain}`} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-gray-400 hover:text-gray-600">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+
+                {/* Desktop: table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50">
+                        <TableHead className="text-xs">Dominio</TableHead>
+                        <TableHead className="text-xs">Emisor del cert.</TableHead>
+                        <TableHead className="text-xs">Fecha cert.</TableHead>
+                        <TableHead className="text-xs">Risk Score</TableHead>
+                        <TableHead className="text-xs">Severidad</TableHead>
+                        <TableHead className="text-xs">Estado</TableHead>
+                        <TableHead className="text-xs"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {domains.map((d) => (
+                        <TableRow key={d.id} className="hover:bg-gray-50">
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Globe2 className="h-4 w-4 shrink-0 text-gray-400" />
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">{d.domain}</p>
+                                {d.ip && (
+                                  <p className="text-xs text-gray-400">{d.ip}</p>
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-[180px] truncate text-xs text-gray-500">
+                            {d.issuer
+                              ? d.issuer.match(/O=([^,]+)/)?.[1] ?? d.issuer
+                              : '—'}
+                          </TableCell>
+                          <TableCell className="text-sm text-gray-600">
+                            {formatCertDate(d.certDate)}
+                          </TableCell>
+                          <TableCell>
+                            <RiskScoreBar score={d.riskScore} />
+                          </TableCell>
+                          <TableCell>
+                            <SeverityBadge severity={d.severity} />
+                          </TableCell>
+                          <TableCell>
+                            <StatusBadge status={d.status} />
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              asChild
+                            >
+                              <a
+                                href={`https://${d.domain}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

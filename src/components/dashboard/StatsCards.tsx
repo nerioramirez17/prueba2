@@ -50,11 +50,11 @@ export function StatsCards() {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <Card key={stat.label} className="border border-gray-200">
-          <CardContent className="p-6">
+          <CardContent className="p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                <p className="mt-1 text-3xl font-bold text-gray-900">{stat.value}</p>
+                <p className="mt-1 text-2xl md:text-3xl font-bold text-gray-900">{stat.value}</p>
               </div>
               <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.iconBg}`}>
                 {stat.icon}

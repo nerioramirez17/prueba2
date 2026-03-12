@@ -247,7 +247,7 @@ export default function CheckerPage() {
             <Shield className="h-4 w-4 text-white" />
           </div>
           <span className="font-semibold text-white">Validador de Phishing</span>
-          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
+          <span className="hidden sm:inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
             IA Activa
           </span>
         </div>
@@ -260,7 +260,7 @@ export default function CheckerPage() {
 
           {/* Welcome state */}
           {messages.length === 0 && (
-            <div className="flex flex-col items-center py-16 text-center">
+            <div className="flex flex-col items-center py-8 md:py-16 text-center">
               <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-xl shadow-blue-600/30">
                 <MailCheck className="h-8 w-8 text-white" />
               </div>
@@ -344,7 +344,7 @@ export default function CheckerPage() {
       </div>
 
       {/* Input */}
-      <div className="relative flex-shrink-0 border-t border-white/10 bg-[#0f1629]/80 px-4 py-3 backdrop-blur-sm">
+      <div className="relative flex-shrink-0 border-t border-white/10 bg-[#0f1629]/80 px-4 py-3 pb-safe backdrop-blur-sm">
         <div className="mx-auto max-w-2xl">
           {/* Screenshot preview */}
           {screenshotPreview && (

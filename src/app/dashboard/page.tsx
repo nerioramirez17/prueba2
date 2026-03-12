@@ -18,7 +18,7 @@ export default function DashboardPage() {
         title="Dashboard"
         subtitle="Resumen de amenazas y actividad del sistema"
       />
-      <div className="flex-1 space-y-6 p-6">
+      <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
         {/* Stats Cards */}
         <StatsCards />
 
