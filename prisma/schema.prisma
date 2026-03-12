@@ -1,0 +1,291 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+
+enum Role {
+  ADMIN
+  ANALYST
+  VIEWER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role      @default(ANALYST)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  threats  Threat[]  @relation("AssignedTo")
+  scanJobs ScanJob[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================================
+// THREATS (base model + type-specific models)
+// ============================================================
+
+enum ThreatType {
+  DOMAIN
+  PHISHING_URL
+  SOCIAL_MEDIA
+  DARK_WEB
+  APP_STORE
+}
+
+enum ThreatSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ThreatStatus {
+  DETECTED
+  ANALYZING
+  CONFIRMED
+  TAKEDOWN_REQUESTED
+  RESOLVED
+  FALSE_POSITIVE
+}
+
+model Threat {
+  id          String         @id @default(cuid())
+  type        ThreatType
+  severity    ThreatSeverity
+  status      ThreatStatus   @default(DETECTED)
+  title       String
+  description String?        @db.Text
+  sourceUrl   String?
+  detectedAt  DateTime       @default(now())
+  resolvedAt  DateTime?
+  updatedAt   DateTime       @updatedAt
+
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedTo", fields: [assignedToId], references: [id])
+
+  domainThreat     DomainThreat?
+  phishingUrl      PhishingUrl?
+  socialThreat     SocialThreat?
+  credentialBreach CredentialBreach?
+  alerts           Alert[]
+
+  @@map("threats")
+}
+
+// Module 1: Domain Watchdog
+model DomainThreat {
+  id               String   @id @default(cuid())
+  threatId         String   @unique
+  threat           Threat   @relation(fields: [threatId], references: [id], onDelete: Cascade)
+  domain           String
+  registrar        String?
+  registrationDate DateTime?
+  expirationDate   DateTime?
+  countryCode      String?
+  ipAddress        String?
+  nameservers      String[] @default([])
+  whoisRaw         String?  @db.Text
+  screenshotUrl    String?
+  riskScore        Int      @default(0) // 0-100
+  similarityScore  Float?               // similarity to cocos-capital.com.ar
+  dnsRecords       Json?
+
+  @@map("domain_threats")
+}
+
+// Module 2: URL Analyzer / Phishing
+model PhishingUrl {
+  id             String   @id @default(cuid())
+  threatId       String   @unique
+  threat         Threat   @relation(fields: [threatId], references: [id], onDelete: Cascade)
+  url            String
+  finalUrl       String?  // after redirects
+  pageTitle      String?
+  isSafe         Boolean?
+  vtScore        Int?     // VirusTotal positives / total
+  vtTotal        Int?
+  urlscanUuid    String?
+  urlscanScore   Int?
+  screenshotUrl  String?
+  rawResponse    Json?
+  analyzedAt     DateTime @default(now())
+
+  @@map("phishing_urls")
+}
+
+// Module 3: Social Media Monitor
+model SocialThreat {
+  id           String   @id @default(cuid())
+  threatId     String   @unique
+  threat       Threat   @relation(fields: [threatId], references: [id], onDelete: Cascade)
+  platform     String   // instagram, x, linkedin, facebook, tiktok
+  username     String
+  displayName  String?
+  profileUrl   String?
+  followersCount Int?
+  isVerified   Boolean  @default(false)
+  bio          String?  @db.Text
+  postsCount   Int?
+  reportedAt   DateTime @default(now())
+  reportUrl    String?  // link to report form / ticket
+
+  @@map("social_threats")
+}
+
+// Module 4: Dark Web / Credential Monitor
+model CredentialBreach {
+  id            String   @id @default(cuid())
+  threatId      String   @unique
+  threat        Threat   @relation(fields: [threatId], references: [id], onDelete: Cascade)
+  email         String
+  domain        String?
+  breachName    String
+  breachDate    DateTime?
+  breachDescription String? @db.Text
+  dataClasses   String[] @default([]) // passwords, emails, names, etc.
+  isVerified    Boolean  @default(false)
+  isPaste       Boolean  @default(false)
+  isSensitive   Boolean  @default(false)
+  sourceUrl     String?
+  notifiedAt    DateTime?
+
+  @@map("credential_breaches")
+}
+
+// ============================================================
+// SCANNER JOBS
+// ============================================================
+
+enum ScanModule {
+  DOMAIN_WATCHDOG
+  PHISHING_ANALYZER
+  SOCIAL_MONITOR
+  DARK_WEB_MONITOR
+  APP_STORE_MONITOR
+}
+
+enum ScanStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model ScanJob {
+  id          String     @id @default(cuid())
+  module      ScanModule
+  status      ScanStatus @default(QUEUED)
+  startedAt   DateTime   @default(now())
+  finishedAt  DateTime?
+  triggeredBy String?    // "SCHEDULER" | "MANUAL" | userId
+  result      Json?      // summary of what was found
+  errorMessage String?   @db.Text
+  threatsFound Int       @default(0)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@map("scan_jobs")
+}
+
+// ============================================================
+// ALERTS
+// ============================================================
+
+enum AlertChannel {
+  SLACK
+  EMAIL
+  WEBHOOK
+}
+
+enum AlertStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model Alert {
+  id        String       @id @default(cuid())
+  threatId  String
+  threat    Threat       @relation(fields: [threatId], references: [id], onDelete: Cascade)
+  channel   AlertChannel
+  status    AlertStatus  @default(PENDING)
+  sentAt    DateTime?
+  message   String       @db.Text
+  metadata  Json?        // channel-specific data (slackTs, emailId, etc.)
+  createdAt DateTime     @default(now())
+
+  @@map("alerts")
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+
+model AppSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("app_settings")
+}
