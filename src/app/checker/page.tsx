@@ -238,20 +238,11 @@ export default function CheckerPage() {
 
       {/* Header */}
       <header className="relative flex h-14 flex-shrink-0 items-center justify-between border-b border-white/10 bg-[#0f1629]/80 px-5 backdrop-blur-sm">
-        <Link href="/" className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors">
-          <ArrowLeft className="h-4 w-4" />
-          Inicio
+        <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+          <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 shadow-lg shadow-blue-600/30">
-            <Shield className="h-4 w-4 text-white" />
-          </div>
-          <span className="font-semibold text-white">Validador de Phishing</span>
-          <span className="hidden sm:inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
-            IA Activa
-          </span>
-        </div>
-        <div className="w-20" />
+        <span className="font-semibold text-white">Validador de Phishing</span>
+        <div className="w-8" />
       </header>
 
       {/* Messages */}

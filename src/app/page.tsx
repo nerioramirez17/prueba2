@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Shield, MailCheck, ArrowRight, Users } from 'lucide-react';
+import { Shield, MailCheck, ArrowRight } from 'lucide-react';
 
 export default function SelectorPage() {
   return (
@@ -32,17 +32,11 @@ export default function SelectorPage() {
               <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-green-50">
                 <MailCheck className="h-7 w-7 text-green-600" />
               </div>
-              <div className="mb-2 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                  <Users className="h-3 w-3" />
-                  Todos los empleados
-                </span>
-              </div>
               <h2 className="mb-2 text-xl font-bold text-gray-900">
                 Validador de Phishing
               </h2>
               <p className="flex-1 text-sm text-gray-500">
-                ¿Recibiste un mail sospechoso? Validá si es phishing antes de interactuar. Ideal para mails de proveedores, pagos y otras ALYCs.
+                ¿Recibiste un mail sospechoso? Validá si es phishing antes de interactuar.
               </p>
               <div className="mt-6 flex items-center text-sm font-semibold text-green-600">
                 Validar un mail
@@ -52,9 +46,7 @@ export default function SelectorPage() {
           </Link>
         </div>
 
-        <p className="mt-8 text-center text-xs text-slate-500">
-          Solo para uso interno del equipo de Cocos Capital
-        </p>
+
       </div>
     </div>
   );
