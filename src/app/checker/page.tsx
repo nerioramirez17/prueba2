@@ -252,8 +252,8 @@ export default function CheckerPage() {
           {/* Welcome state */}
           {messages.length === 0 && (
             <div className="flex flex-col items-center py-8 md:py-16 text-center">
-              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-xl shadow-blue-600/30">
-                <MailCheck className="h-8 w-8 text-white" />
+              <div className="mb-5">
+                <img src="/loyalty-badge.svg" alt="" className="h-16 w-16" />
               </div>
               <h2 className="mb-3 text-2xl font-bold text-white">
                 ¿Recibiste un mail<br />
@@ -344,7 +344,7 @@ export default function CheckerPage() {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-slate-200 transition-colors"
+              className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-slate-300 hover:bg-white/20 hover:text-slate-100 transition-colors"
               title="Adjuntar captura"
             >
               <ImagePlus className="h-5 w-5" />
