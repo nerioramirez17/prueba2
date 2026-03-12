@@ -32,30 +32,33 @@ interface Message {
 const verdictConfig = {
   PHISHING: {
     label: 'PHISHING',
-    border: 'border-red-300',
-    bg: 'bg-red-50',
-    badge: 'bg-red-600 text-white',
+    border: 'border-red-500/40',
+    bg: 'bg-red-500/10',
+    badge: 'bg-red-500/20 text-red-400 border border-red-500/30',
     icon: AlertTriangle,
-    iconColor: 'text-red-600',
+    iconColor: 'text-red-400',
     barColor: 'bg-red-500',
+    barBg: 'bg-red-500/20',
   },
   LEGITIMO: {
     label: 'LEGÍTIMO',
-    border: 'border-green-300',
-    bg: 'bg-green-50',
-    badge: 'bg-green-600 text-white',
+    border: 'border-emerald-500/40',
+    bg: 'bg-emerald-500/10',
+    badge: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
     icon: CheckCircle2,
-    iconColor: 'text-green-600',
-    barColor: 'bg-green-500',
+    iconColor: 'text-emerald-400',
+    barColor: 'bg-emerald-500',
+    barBg: 'bg-emerald-500/20',
   },
   SOSPECHOSO: {
     label: 'SOSPECHOSO',
-    border: 'border-amber-300',
-    bg: 'bg-amber-50',
-    badge: 'bg-amber-500 text-white',
+    border: 'border-amber-500/40',
+    bg: 'bg-amber-500/10',
+    badge: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
     icon: HelpCircle,
-    iconColor: 'text-amber-500',
+    iconColor: 'text-amber-400',
     barColor: 'bg-amber-500',
+    barBg: 'bg-amber-500/20',
   },
 };
 
@@ -65,45 +68,45 @@ function ResultCard({ result }: { result: AnalysisResult }) {
   const Icon = cfg.icon;
 
   return (
-    <div className={`rounded-2xl border-2 ${cfg.border} ${cfg.bg} p-4 max-w-xl`}>
+    <div className={`rounded-2xl border ${cfg.border} ${cfg.bg} p-4 max-w-xl backdrop-blur-sm`}>
       {/* Verdict + confidence */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Icon className={`h-5 w-5 ${cfg.iconColor}`} />
-          <span className={`rounded-full px-3 py-0.5 text-xs font-bold tracking-wide ${cfg.badge}`}>
+          <Icon className={`h-4 w-4 ${cfg.iconColor}`} />
+          <span className={`rounded-full px-3 py-0.5 text-xs font-bold tracking-widest uppercase ${cfg.badge}`}>
             {cfg.label}
           </span>
         </div>
-        <span className="text-sm font-semibold text-gray-600">{result.confidence}% confianza</span>
+        <span className="text-xs font-medium text-slate-400">{result.confidence}% confianza</span>
       </div>
 
-      <div className="mb-3 h-1.5 overflow-hidden rounded-full bg-white/60">
+      <div className={`mb-3 h-1 overflow-hidden rounded-full ${cfg.barBg}`}>
         <div className={`h-full rounded-full ${cfg.barColor} transition-all`} style={{ width: `${result.confidence}%` }} />
       </div>
 
-      <p className="mb-3 text-sm font-medium text-gray-800">{result.summary}</p>
+      <p className="mb-3 text-sm font-medium text-white/90">{result.summary}</p>
 
       {/* Recommendation */}
-      <div className="mb-3 rounded-xl bg-white/70 px-3 py-2.5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-0.5">Qué hacer</p>
-        <p className="text-sm text-gray-800">{result.recommendation}</p>
+      <div className="mb-3 rounded-xl bg-white/5 border border-white/10 px-3 py-2.5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-0.5">Qué hacer</p>
+        <p className="text-sm text-slate-300">{result.recommendation}</p>
       </div>
 
       {/* Flags */}
       <div className="grid grid-cols-2 gap-3 mb-3">
         {result.red_flags.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-red-600 mb-1">⚠ Señales de alerta</p>
+            <p className="text-xs font-semibold text-red-400 mb-1 uppercase tracking-wide">⚠ Alertas</p>
             <ul className="space-y-0.5">
-              {result.red_flags.map((f, i) => <li key={i} className="text-xs text-gray-700">• {f}</li>)}
+              {result.red_flags.map((f, i) => <li key={i} className="text-xs text-slate-400">• {f}</li>)}
             </ul>
           </div>
         )}
         {result.green_flags.length > 0 && (
           <div>
-            <p className="text-xs font-semibold text-green-700 mb-1">✓ Indicadores OK</p>
+            <p className="text-xs font-semibold text-emerald-400 mb-1 uppercase tracking-wide">✓ OK</p>
             <ul className="space-y-0.5">
-              {result.green_flags.map((f, i) => <li key={i} className="text-xs text-gray-700">• {f}</li>)}
+              {result.green_flags.map((f, i) => <li key={i} className="text-xs text-slate-400">• {f}</li>)}
             </ul>
           </div>
         )}
@@ -111,15 +114,15 @@ function ResultCard({ result }: { result: AnalysisResult }) {
 
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
+        className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors"
       >
         {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
         {expanded ? 'Ocultar análisis' : 'Ver análisis completo'}
       </button>
 
       {expanded && (
-        <div className="mt-2 rounded-xl bg-white/70 p-3">
-          <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">{result.analysis}</p>
+        <div className="mt-2 rounded-xl bg-white/5 border border-white/10 p-3">
+          <p className="text-xs text-slate-400 leading-relaxed whitespace-pre-line">{result.analysis}</p>
         </div>
       )}
     </div>
@@ -167,7 +170,6 @@ export default function CheckerPage() {
       imagePreview: screenshotPreview || undefined,
     };
 
-    // Capture current state before updating
     const currentScreenshot = screenshot;
     const history = buildHistory(messages);
 
@@ -217,7 +219,6 @@ export default function CheckerPage() {
     }
   };
 
-  // Auto-resize textarea
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     const el = e.target;
@@ -226,19 +227,27 @@ export default function CheckerPage() {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col bg-[#0f1629]">
+      {/* Background grid */}
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C%2Fg%3E%3C%2Fsvg%3E")`,
+        }}
+      />
+
       {/* Header */}
-      <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-gray-200 bg-white px-5 shadow-sm">
-        <Link href="/" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+      <header className="relative flex h-14 flex-shrink-0 items-center justify-between border-b border-white/10 bg-[#0f1629]/80 px-5 backdrop-blur-sm">
+        <Link href="/" className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors">
           <ArrowLeft className="h-4 w-4" />
           Inicio
         </Link>
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 shadow-lg shadow-blue-600/30">
             <Shield className="h-4 w-4 text-white" />
           </div>
-          <span className="font-semibold text-gray-900">Validador de Phishing</span>
-          <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+          <span className="font-semibold text-white">Validador de Phishing</span>
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
             IA Activa
           </span>
         </div>
@@ -246,34 +255,33 @@ export default function CheckerPage() {
       </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="relative flex-1 overflow-y-auto px-4 py-6">
         <div className="mx-auto max-w-2xl space-y-5">
 
           {/* Welcome state */}
           {messages.length === 0 && (
             <div className="flex flex-col items-center py-16 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-500/20">
+              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-xl shadow-blue-600/30">
                 <MailCheck className="h-8 w-8 text-white" />
               </div>
-              <h2 className="mb-2 text-lg font-semibold text-gray-800">¿Recibiste un mail sospechoso?</h2>
-              <p className="max-w-sm text-sm text-gray-500">
-                Pegá el remitente, el asunto, el cuerpo del mail, o adjuntá una captura. Con cualquiera de esas cosas te digo si es phishing.
+              <h2 className="mb-3 text-2xl font-bold text-white">
+                Leé lo que viene<br />
+                <span className="text-blue-400">después del @</span>
+              </h2>
+              <p className="max-w-sm text-sm text-slate-400 leading-relaxed">
+                Pegá el remitente, el asunto o el cuerpo del mail, o adjuntá una captura. Si genera dudas, no hagas clic.
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-2">
-                {[
-                  'De: soporte@cocos-capital.net\nAsunto: Tu cuenta fue suspendida',
-                  'Te mando un mail raro de MercadoPago pidiendo validar mi cuenta',
-                  '"Hacé clic acá para desbloquear tu inversión"',
-                ].map((example) => (
-                  <button
-                    key={example}
-                    onClick={() => setInput(example)}
-                    className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left max-w-xs"
+                {['@cocos.capital', '@cocoscrypto.com', '@mailing.cocos.capital'].map((d) => (
+                  <span
+                    key={d}
+                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300"
                   >
-                    {example.length > 60 ? example.slice(0, 60) + '…' : example}
-                  </button>
+                    {d}
+                  </span>
                 ))}
               </div>
+              <p className="mt-2 text-xs text-slate-600">dominios oficiales de Cocos</p>
             </div>
           )}
 
@@ -281,14 +289,14 @@ export default function CheckerPage() {
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} gap-3`}>
               {msg.role === 'assistant' && (
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 shadow-sm">
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 shadow-lg shadow-blue-600/30">
                   <Shield className="h-4 w-4 text-white" />
                 </div>
               )}
 
               <div className="max-w-xl">
                 {msg.role === 'user' && (
-                  <div className="rounded-2xl rounded-tr-none bg-blue-600 px-4 py-3 text-sm text-white">
+                  <div className="rounded-2xl rounded-tr-none bg-blue-600 px-4 py-3 text-sm text-white shadow-lg shadow-blue-600/20">
                     {msg.imagePreview && (
                       <img src={msg.imagePreview} alt="" className="mb-2 max-h-40 rounded-lg object-cover" />
                     )}
@@ -298,7 +306,7 @@ export default function CheckerPage() {
                 )}
 
                 {msg.role === 'assistant' && msg.question && (
-                  <div className="rounded-2xl rounded-tl-none border border-gray-200 bg-white px-4 py-3 shadow-sm text-sm text-gray-800">
+                  <div className="rounded-2xl rounded-tl-none border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 backdrop-blur-sm">
                     {msg.question}
                   </div>
                 )}
@@ -308,7 +316,7 @@ export default function CheckerPage() {
                 )}
 
                 {msg.role === 'assistant' && msg.error && (
-                  <div className="rounded-2xl rounded-tl-none border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <div className="rounded-2xl rounded-tl-none border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
                     {msg.error}
                   </div>
                 )}
@@ -319,11 +327,11 @@ export default function CheckerPage() {
           {/* Loading */}
           {loading && (
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 shadow-sm">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 shadow-lg shadow-blue-600/30">
                 <Shield className="h-4 w-4 text-white" />
               </div>
-              <div className="rounded-2xl rounded-tl-none border border-gray-200 bg-white px-4 py-3 shadow-sm">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="rounded-2xl rounded-tl-none border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Analizando...
                 </div>
@@ -336,27 +344,27 @@ export default function CheckerPage() {
       </div>
 
       {/* Input */}
-      <div className="flex-shrink-0 border-t border-gray-200 bg-white px-4 py-3">
+      <div className="relative flex-shrink-0 border-t border-white/10 bg-[#0f1629]/80 px-4 py-3 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl">
           {/* Screenshot preview */}
           {screenshotPreview && (
-            <div className="mb-2 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1.5 pr-2">
+            <div className="mb-2 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-1.5 pr-2">
               <img src={screenshotPreview} alt="" className="h-10 rounded object-cover" />
-              <span className="text-xs text-gray-500 max-w-32 truncate">{screenshot?.name}</span>
+              <span className="text-xs text-slate-400 max-w-32 truncate">{screenshot?.name}</span>
               <button
                 onClick={() => { setScreenshot(null); setScreenshotPreview(null); }}
-                className="flex h-4 w-4 items-center justify-center rounded-full bg-gray-400 text-white hover:bg-gray-600"
+                className="flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
               >
                 <X className="h-2.5 w-2.5" />
               </button>
             </div>
           )}
 
-          <div className="flex items-end gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2.5">
+          <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5">
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex-shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
+              className="flex-shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-white/10 hover:text-slate-300 transition-colors"
               title="Adjuntar captura"
             >
               <ImagePlus className="h-5 w-5" />
@@ -372,19 +380,19 @@ export default function CheckerPage() {
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
               placeholder="Pegá el mail, el remitente, el asunto… lo que tengas"
-              className="flex-1 resize-none bg-transparent text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none"
+              className="flex-1 resize-none bg-transparent text-sm text-white placeholder:text-slate-600 focus:outline-none"
               style={{ maxHeight: '160px' }}
             />
 
             <button
               onClick={handleSend}
               disabled={!canSend}
-              className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400"
+              className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-500 disabled:bg-white/10 disabled:text-slate-600 shadow-lg shadow-blue-600/20 disabled:shadow-none"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </button>
           </div>
-          <p className="mt-1.5 text-center text-xs text-gray-400">Enter para enviar · Shift+Enter para nueva línea</p>
+          <p className="mt-1.5 text-center text-xs text-slate-700">Enter para enviar · Shift+Enter para nueva línea</p>
         </div>
       </div>
     </div>
