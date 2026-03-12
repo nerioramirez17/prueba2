@@ -354,7 +354,7 @@ export default function CheckerPage() {
 
             <textarea
               ref={textareaRef}
-              rows={2}
+              rows={1}
               value={input}
               onChange={handleInput}
               onKeyDown={handleKeyDown}
