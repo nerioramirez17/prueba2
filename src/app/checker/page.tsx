@@ -25,6 +25,7 @@ interface Message {
   text?: string;
   imagePreview?: string;
   result?: AnalysisResult;
+  question?: string;
   error?: string;
 }
 
@@ -148,6 +149,15 @@ export default function CheckerPage() {
     reader.readAsDataURL(file);
   };
 
+  const buildHistory = (msgs: Message[]) => {
+    return msgs.map(m => ({
+      role: m.role,
+      content: m.role === 'user'
+        ? [m.imagePreview ? '[imagen adjunta]' : '', m.text || ''].filter(Boolean).join(' ')
+        : m.question || m.result?.summary || m.error || '',
+    })).filter(m => m.content.trim());
+  };
+
   const handleSend = async () => {
     if (!canSend) return;
 
@@ -156,6 +166,10 @@ export default function CheckerPage() {
       text: input.trim() || undefined,
       imagePreview: screenshotPreview || undefined,
     };
+
+    // Capture current state before updating
+    const currentScreenshot = screenshot;
+    const history = buildHistory(messages);
 
     setMessages(prev => [...prev, userMsg]);
     setInput('');
@@ -166,13 +180,16 @@ export default function CheckerPage() {
     try {
       const fd = new FormData();
       fd.append('message', userMsg.text || '');
-      if (screenshot) fd.append('screenshot', screenshot);
+      if (currentScreenshot) fd.append('screenshot', currentScreenshot);
+      fd.append('history', JSON.stringify(history));
 
       const res = await fetch('/api/checker/analyze', { method: 'POST', body: fd });
       const data = await res.json();
 
       if (data.error) {
         setMessages(prev => [...prev, { role: 'assistant', error: data.error }]);
+      } else if (data.type === 'question') {
+        setMessages(prev => [...prev, { role: 'assistant', question: data.text }]);
       } else {
         setMessages(prev => [...prev, { role: 'assistant', result: data }]);
       }
@@ -277,6 +294,12 @@ export default function CheckerPage() {
                     )}
                     {msg.text && <p className="whitespace-pre-wrap">{msg.text}</p>}
                     {!msg.text && msg.imagePreview && <p className="opacity-70 text-xs">Captura adjunta</p>}
+                  </div>
+                )}
+
+                {msg.role === 'assistant' && msg.question && (
+                  <div className="rounded-2xl rounded-tl-none border border-gray-200 bg-white px-4 py-3 shadow-sm text-sm text-gray-800">
+                    {msg.question}
                   </div>
                 )}
 
